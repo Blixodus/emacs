@@ -1,0 +1,7 @@
+# Ignore everything
+*
+
+# Except the .el files
+!*.el
+!.git*
+!README.md
