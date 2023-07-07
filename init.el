@@ -43,6 +43,15 @@
   (load bootstrap-file nil 'nomessage))
 (straight-use-package 'use-package)
 
+;; Multiple cursors
+(use-package multiple-cursors
+	:straight t
+	:ensure t
+	:bind (("C-c m c" . 'mc/edit-lines)
+				 ("C-c m n" . 'mc/mark-next-like-this)
+				 ("C-c m p" . 'mc/mark-previous-like-this)
+				 ("C-c m a" . 'mc/mark-all-like-this)))
+
 ;; Comment hiding
 (use-package hide-comnt
 	:straight (:host github :repo "emacsmirror/hide-comnt")
@@ -58,11 +67,11 @@
   ;; disable inline previews
   (delq 'company-preview-if-just-one-frontend company-frontends))
   
-(define-key copilot-completion-map (kbd "C-x c a") 'copilot-accept-completion)
-(define-key copilot-completion-map (kbd "C-x c l") 'copilot-accept-completion-by-line)
-(define-key copilot-completion-map (kbd "C-x c w") 'copilot-accept-completion-by-word)
-(define-key copilot-completion-map (kbd "C-x c n") 'copilot-next-completion)
-(define-key copilot-completion-map (kbd "C-x c p") 'copilot-previous-completion)
+(define-key copilot-completion-map (kbd "C-c c a") 'copilot-accept-completion)
+(define-key copilot-completion-map (kbd "C-c c l") 'copilot-accept-completion-by-line)
+(define-key copilot-completion-map (kbd "C-c c w") 'copilot-accept-completion-by-word)
+(define-key copilot-completion-map (kbd "C-c c n") 'copilot-next-completion)
+(define-key copilot-completion-map (kbd "C-c c p") 'copilot-previous-completion)
 
 ;; Highlight TODO, FIXME, etc.
 (use-package hl-todo
