@@ -18,15 +18,6 @@
 (setq column-number-mode t) ;; Display column numbers
 (setq package-enable-at-startup nil)
 
-(defun split-3-windows-horizontally-evenly ()
-  (interactive)
-  (command-execute 'split-window-horizontally)
-  (command-execute 'split-window-horizontally)
-  (command-execute 'balance-windows)
-)
-
-(global-set-key (kbd "C-x 4") 'split-3-windows-horizontally-evenly)
-
 ;; Bootstrap straight.el (do not modify)
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -188,116 +179,46 @@
 (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
 (add-hook 'c-mode-hook 'eglot-ensure)
 (add-hook 'c++-mode-hook 'eglot-ensure)
+(add-hook 'cuda-mode-hook 'eglot-ensure)
+(add-hook 'eglot-managed-mode-hook (lambda () (eglot-inlay-hints-mode -1))) 
 
-;; Customize variables (generated)
+;; ;; LSP-Mode and DAP-Mode
+;; (use-package lsp-mode
+;; 	:straight t
+;;   :init
+;;   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+;;   (setq lsp-keymap-prefix "C-c l")
+;;   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+;;          (c-mode . lsp)
+;;          (c++-mode . lsp)
+;;          (cuda-mode . lsp)
+;;          ;; if you want which-key integration
+;;          (lsp-mode . lsp-enable-which-key-integration))
+;;   :commands lsp)
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-	 '(lua-mode eglot treemacs-tab-bar treemacs-persp treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil treemacs cmake-font-lock cuda-mode use-package))
- '(safe-local-variable-values
-	 '((c-offsets-alist
-			(inexpr-class . +)
-			(inexpr-statement . +)
-			(lambda-intro-cont . +)
-			(inlambda . c-lineup-inexpr-block)
-			(template-args-cont c-lineup-template-args +)
-			(incomposition . +)
-			(inmodule . +)
-			(innamespace . +)
-			(inextern-lang . +)
-			(composition-close . 0)
-			(module-close . 0)
-			(namespace-close . 0)
-			(extern-lang-close . 0)
-			(composition-open . 0)
-			(module-open . 0)
-			(namespace-open . 0)
-			(extern-lang-open . 0)
-			(objc-method-call-cont c-lineup-ObjC-method-call-colons c-lineup-ObjC-method-call +)
-			(objc-method-args-cont . c-lineup-ObjC-method-args)
-			(objc-method-intro .
-												 [0])
-			(friend . 0)
-			(cpp-define-intro c-lineup-cpp-define +)
-			(cpp-macro-cont . +)
-			(cpp-macro .
-								 [0])
-			(inclass . +)
-			(stream-op . c-lineup-streamop)
-			(arglist-cont-nonempty c-lineup-gcc-asm-reg c-lineup-arglist)
-			(arglist-cont c-lineup-gcc-asm-reg 0)
-			(arglist-intro . +)
-			(catch-clause . 0)
-			(else-clause . 0)
-			(do-while-closure . 0)
-			(label . 2)
-			(access-label . -)
-			(substatement-label . 2)
-			(substatement . +)
-			(statement-case-open . 0)
-			(statement-case-intro . +)
-			(statement-block-intro . +)
-			(statement-cont . +)
-			(statement . 0)
-			(brace-entry-open . 0)
-			(brace-list-entry . 0)
-			(brace-list-intro . +)
-			(brace-list-close . 0)
-			(brace-list-open . 0)
-			(block-close . 0)
-			(inher-cont . c-lineup-multi-inher)
-			(inher-intro . +)
-			(member-init-cont . c-lineup-multi-inher)
-			(member-init-intro . +)
-			(annotation-var-cont . +)
-			(annotation-top-cont . 0)
-			(topmost-intro-cont . c-lineup-topmost-intro-cont)
-			(topmost-intro . 0)
-			(knr-argdecl . 0)
-			(func-decl-cont . +)
-			(inline-close . 0)
-			(inline-open . +)
-			(class-close . 0)
-			(class-open . 0)
-			(defun-block-intro . +)
-			(defun-close . 0)
-			(defun-open . 0)
-			(string . c-lineup-dont-change)
-			(arglist-close . c-lineup-arglist)
-			(substatement-open . 0)
-			(case-label . 0)
-			(block-open . 0)
-			(c . 1)
-			(comment-intro . 0)
-			(knr-argdecl-intro . -))
-		 (c-cleanup-list scope-operator brace-else-brace brace-elseif-brace brace-catch-brace empty-defun-braces list-close-comma defun-close-semi)
-		 (c-hanging-semi&comma-criteria c-semi&comma-no-newlines-before-nonblanks)
-		 (c-hanging-colons-alist
-			(member-init-intro before)
-			(inher-intro)
-			(case-label after)
-			(label after)
-			(access-label after))
-		 (c-hanging-braces-alist
-			(substatement-open after)
-			(brace-list-open after)
-			(brace-entry-open)
-			(defun-open after)
-			(class-open after)
-			(inline-open after)
-			(block-open after)
-			(block-close . c-snug-do-while)
-			(statement-case-open after)
-			(substatement after))
-		 (c-comment-only-line-offset . 0)
-		 (c-tab-always-indent . t))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;; ;; optionally
+;; (use-package lsp-ui
+;; 	:straight t
+;; 	:commands lsp-ui-mode)
+;; ;; if you are helm user
+;; (use-package helm-lsp 
+;; 	:straight t
+;; 	:commands helm-lsp-workspace-symbol)
+;; ;; if you are ivy user
+;; (use-package lsp-ivy 
+;; 	:straight t
+;; 	:commands lsp-ivy-workspace-symbol)
+;; (use-package lsp-treemacs 
+;; 	:straight t
+;; 	:commands lsp-treemacs-errors-list)
+
+;; ;; optionally if you want to use debugger
+;; (use-package dap-mode
+;; 	:straight t)
+;; ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
+
+;; ;; optional if you want which-key integration
+;; (use-package which-key
+;; 	:straight t
+;; 	:config
+;;     (which-key-mode))
