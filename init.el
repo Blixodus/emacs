@@ -46,39 +46,35 @@
 ;; Comment hiding
 (use-package hide-comnt
 	:straight (:host github :repo "emacsmirror/hide-comnt")
-	:ensure t
-	)
+	:ensure t)
 
 ;; GitHub Copilot
 (use-package copilot
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-  :ensure t)
-(add-hook 'prog-mode-hook 'copilot-mode)
+  :ensure t
+	:bind (("C-c c a" . 'copilot-accept-completion)
+				 ("C-c c l" . 'copilot-accept-completion-by-line)
+				 ("C-c c w" . 'copilot-accept-completion-by-word)
+				 ("C-c c n" . 'copilot-next-completion)
+				 ("C-c c p" . 'copilot-previous-completion))
+	:hook ((prog-mode . copilot-mode)
+				 (text-mode . copilot-mode)))
 (with-eval-after-load 'company
   ;; disable inline previews
   (delq 'company-preview-if-just-one-frontend company-frontends))
-  
-(define-key copilot-completion-map (kbd "C-c c a") 'copilot-accept-completion)
-(define-key copilot-completion-map (kbd "C-c c l") 'copilot-accept-completion-by-line)
-(define-key copilot-completion-map (kbd "C-c c w") 'copilot-accept-completion-by-word)
-(define-key copilot-completion-map (kbd "C-c c n") 'copilot-next-completion)
-(define-key copilot-completion-map (kbd "C-c c p") 'copilot-previous-completion)
 
 ;; Highlight TODO, FIXME, etc.
 (use-package hl-todo
   :straight (:host github :repo "tarsius/hl-todo" :files ("*.el"))
 	:ensure t
-  :hook (prog-mode . hl-todo-mode)
-	)
+  :hook (prog-mode . hl-todo-mode))
 
 ;; CUDA Mode
-
 (use-package cuda-mode
   :straight t
 	:ensure t)
 
 ;; CMake Mode
-
 (use-package cmake-mode
 	:straight (:host github :repo "Kitware/CMake" :files ("Auxiliary/cmake-mode.el"))
 	:ensure t)
@@ -89,12 +85,10 @@
 (require 'cmake-font-lock)
   
 ;; Haskell Mode
-
 ;; (use-package haskell-mode
 ;;   :ensure t)
 
 ;; OCaml Mode
-
 ;; (use-package tuareg
 ;;   :ensure t
 ;;   :config
@@ -107,17 +101,14 @@
 ;;   (add-hook 'tuareg-mode-hook 'merlin-mode))
 
 ;; Rust Mode
-
 ;; (use-package rust-mode
 ;;   :ensure t)
 
 ;; Lua Mode
-
 ;; (use-package lua-mode
 ;; 	:ensure t)
 
 ;; Ivy and Counsel (better completion)
-
 (use-package ivy
   :straight t
 	:ensure t
@@ -173,7 +164,12 @@
 ;; Eglot 
 (use-package eglot
   :straight t
-	:ensure t)
+	:ensure t
+	;; :hook ((c-mode-hook . eglot-ensure)
+	;; 			 (c++-mode-hook . eglot-ensure)
+	;; 			 (cuda-mode-hook . eglot-ensure)
+	;; 			 (eglot-managed-mode-hook . (lambda () (eglot-inlay-hints-mode -1)))))
+)
 
 (require 'eglot)
 (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
