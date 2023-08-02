@@ -11,7 +11,7 @@
    kept-new-versions 6
    kept-old-versions 2
    version-control t)
-(add-hook 'prog-mode-hook 'linum-mode) ;; Line numbers
+(add-hook 'prog-mode-hook 'display-line-numbers-mode) ;; Line numbers
 (setq-default indent-tabs-mode t) ;; Tabs as indentation
 (setq-default tab-width 2) ;; Tabs have a width of 2 spaces
 (add-to-list 'default-frame-alist '(fullscreen . maximized)) ;; start every frame maximized
