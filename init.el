@@ -83,6 +83,27 @@
 	:straight t
 	:ensure t)
 (require 'cmake-font-lock)
+
+;; ParEdit
+(use-package paredit
+	:straight t
+	:ensure t
+	:hook ((emacs-lisp-mode . paredit-mode)
+				 (lisp-mode . paredit-mode)
+				 (lisp-interaction-mode . paredit-mode)
+				 (scheme-mode . paredit-mode)
+				 (clojure-mode . paredit-mode)
+				 (cider-repl-mode . paredit-mode)
+				 (eval-expression-minibuffer-setup . paredit-mode)
+				 (ielm-mode . paredit-mode)
+				 (lisp-mode . enable-paredit-mode)
+				 (racket-mode . enable-paredit-mode)
+				 (racket-repl-mode . enable-paredit-mode)
+				 (scheme-mode . enable-paredit-mode)
+				 (clojure-mode . enable-paredit-mode)
+				 (cider-repl-mode . enable-paredit-mode)
+				 (eval-expression-minibuffer-setup . enable-paredit-mode)
+				 (ielm-mode . enable-paredit-mode)))
   
 ;; Haskell Mode
 ;; (use-package haskell-mode
