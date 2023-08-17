@@ -14,9 +14,20 @@
 (add-hook 'prog-mode-hook 'display-line-numbers-mode) ;; Line numbers
 (setq-default indent-tabs-mode t) ;; Tabs as indentation
 (setq-default tab-width 2) ;; Tabs have a width of 2 spaces
-(add-to-list 'default-frame-alist '(fullscreen . maximized)) ;; start every frame maximized
+;;(add-to-list 'default-frame-alist '(fullscreen . maximized)) ;; start every frame maximized
 (setq column-number-mode t) ;; Display column numbers
 (setq package-enable-at-startup nil)
+
+;; Tree-sitter configuration
+(setq treesit-language-source-alist
+			'((c "https://github.com/tree-sitter/tree-sitter-c")
+				(cpp "https://github.com/tree-sitter/tree-sitter-cpp")))
+
+(mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))
+
+(add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
+(add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
+(add-to-list 'major-mode-remap-alist '(c-or-c++-mode . c-or-c++-ts-mode))
 
 ;; Bootstrap straight.el (do not modify)
 (defvar bootstrap-version)
@@ -58,6 +69,7 @@
 				 ("C-c c n" . 'copilot-next-completion)
 				 ("C-c c p" . 'copilot-previous-completion))
 	:hook ((prog-mode . copilot-mode)
+				 (cuda-mode . copilot-mode)
 				 (text-mode . copilot-mode)))
 (with-eval-after-load 'company
   ;; disable inline previews
@@ -186,18 +198,15 @@
 (use-package eglot
   :straight t
 	:ensure t
-	;; :hook ((c-mode-hook . eglot-ensure)
-	;; 			 (c++-mode-hook . eglot-ensure)
-	;; 			 (cuda-mode-hook . eglot-ensure)
-	;; 			 (eglot-managed-mode-hook . (lambda () (eglot-inlay-hints-mode -1)))))
-)
+	:hook ((c-mode . eglot-ensure)
+				 (c++-mode . eglot-ensure)
+				 (c-ts-mode . eglot-ensure)
+				 (c++-ts-mode . eglot-ensure)
+				 (cuda-mode . eglot-ensure)
+				 (eglot-managed-mode . (lambda () (eglot-inlay-hints-mode -1)))))
 
 (require 'eglot)
-(add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
-(add-hook 'c-mode-hook 'eglot-ensure)
-(add-hook 'c++-mode-hook 'eglot-ensure)
-(add-hook 'cuda-mode-hook 'eglot-ensure)
-(add-hook 'eglot-managed-mode-hook (lambda () (eglot-inlay-hints-mode -1))) 
+(add-to-list 'eglot-server-programs '((c++-ts-mode c-ts-mode c++-mode c-mode cuda-mode) "clangd"))
 
 ;; ;; LSP-Mode and DAP-Mode
 ;; (use-package lsp-mode
