@@ -81,10 +81,10 @@
 	:ensure t
   :hook (prog-mode . hl-todo-mode))
 
-;; CUDA Mode
-(use-package cuda-mode
-  :straight t
-	:ensure t)
+;; ;; CUDA Mode
+;; (use-package cuda-mode
+;;   :straight t
+;; 	:ensure t)
 
 ;; CMake Mode
 (use-package cmake-mode
@@ -194,7 +194,7 @@
     :ensure t
     :config (counsel-projectile-mode)))
 
-;; Eglot 
+;; Eglot
 (use-package eglot
   :straight t
 	:ensure t
