@@ -85,6 +85,7 @@
 ;; (use-package cuda-mode
 ;;   :straight t
 ;; 	:ensure t)
+(add-to-list 'auto-mode-alist '("\\.cu\\'" . c++-ts-mode))
 
 ;; CMake Mode
 (use-package cmake-mode
