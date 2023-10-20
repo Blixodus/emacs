@@ -60,19 +60,19 @@
 	:ensure t)
 
 ;; GitHub Copilot
-;; (use-package copilot
-;;   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-;;   :ensure t
-;; 	:bind (("C-c c a" . 'copilot-accept-completion)
-;; 				 ("C-c c l" . 'copilot-accept-completion-by-line)
-;; 				 ("C-c c w" . 'copilot-accept-completion-by-word)
-;; 				 ("C-c c n" . 'copilot-next-completion)
-;; 				 ("C-c c p" . 'copilot-previous-completion))
-;; 	:hook ((prog-mode . copilot-mode)
-;; 				 (cuda-mode . copilot-mode)))
-;; (with-eval-after-load 'company
-;;   ;; disable inline previews
-;;   (delq 'company-preview-if-just-one-frontend company-frontends))
+(use-package copilot
+  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+  :ensure t
+	:bind (("C-c c a" . 'copilot-accept-completion)
+				 ("C-c c l" . 'copilot-accept-completion-by-line)
+				 ("C-c c w" . 'copilot-accept-completion-by-word)
+				 ("C-c c n" . 'copilot-next-completion)
+				 ("C-c c p" . 'copilot-previous-completion))
+	:hook ((prog-mode . copilot-mode)
+				 (cuda-mode . copilot-mode)))
+(with-eval-after-load 'company
+  ;; disable inline previews
+  (delq 'company-preview-if-just-one-frontend company-frontends))
 
 ;; Highlight TODO, FIXME, etc.
 (use-package hl-todo
