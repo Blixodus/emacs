@@ -45,6 +45,11 @@
   (load bootstrap-file nil 'nomessage))
 (straight-use-package 'use-package)
 
+;; Guix package manager utility for Emacs
+(use-package guix
+	:straight t
+	:ensure t)
+
 ;; Multiple cursors
 (use-package multiple-cursors
 	:straight t
@@ -63,13 +68,15 @@
 (use-package copilot
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
   :ensure t
-	:bind (("C-c c a" . 'copilot-accept-completion)
+	:bind (("C-c c c" . 'copilot-complete)
+				 ("C-c c a" . 'copilot-accept-completion)
 				 ("C-c c l" . 'copilot-accept-completion-by-line)
 				 ("C-c c w" . 'copilot-accept-completion-by-word)
 				 ("C-c c n" . 'copilot-next-completion)
 				 ("C-c c p" . 'copilot-previous-completion))
 	:hook ((prog-mode . copilot-mode)
-				 (cuda-mode . copilot-mode)))
+				 (cuda-mode . copilot-mode))
+	:config (setq copilot-idle-delay 10000.0))
 (with-eval-after-load 'company
   ;; disable inline previews
   (delq 'company-preview-if-just-one-frontend company-frontends))
