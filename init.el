@@ -50,6 +50,11 @@
 	:straight t
 	:ensure t)
 
+;; RMSbolt to explore assembly
+(use-package rmsbolt
+	:straight t
+	:ensure t)
+
 ;; Multiple cursors
 (use-package multiple-cursors
 	:straight t
