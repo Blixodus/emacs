@@ -1,6 +1,5 @@
+(setq gc-cons-threshold 10000000)
 (tool-bar-mode -1) ;; remove toolbar
-;;(toggle-scroll-bar -1) ;; remove scrollbar
-;;(setq inhibit-startup-screen t) ;; no startup screen
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ;; mouse scroll one line at a time
 (setq mouse-wheel-progressive-speed nil) ;; don't accelerate mouse scrolling
 (setq
@@ -45,12 +44,29 @@
   (load bootstrap-file nil 'nomessage))
 (straight-use-package 'use-package)
 
+;; Magic hack for garbage collector
+(use-package gcmh
+	:straight t
+	:ensure t)
+(gcmh-mode 1)
+
 ;; Guix package manager utility for Emacs
+(use-package geiser
+	:straight t
+	:ensure t
+	:config
+	(setq geiser-guile-binary (executable-find "guile-3.0"))
+	(setq geiser-default-implementation '(guile)))
+
+(use-package geiser-guile
+	:straight t
+	:ensure t)
+
 (use-package guix
 	:straight t
 	:ensure t)
 
-;; RMSbolt to explore assembly
+;; Packages to explore assembly
 (use-package rmsbolt
 	:straight t
 	:ensure t)
@@ -63,11 +79,6 @@
 				 ("C-c m n" . 'mc/mark-next-like-this)
 				 ("C-c m p" . 'mc/mark-previous-like-this)
 				 ("C-c m a" . 'mc/mark-all-like-this)))
-
-;; Comment hiding
-(use-package hide-comnt
-	:straight (:host github :repo "emacsmirror/hide-comnt")
-	:ensure t)
 
 ;; GitHub Copilot
 (use-package copilot
@@ -103,6 +114,7 @@
 	:straight (:host github :repo "Kitware/CMake" :files ("Auxiliary/cmake-mode.el"))
 	:ensure t)
 (require 'cmake-mode)
+
 (use-package cmake-font-lock
 	:straight t
 	:ensure t)
