@@ -1,7 +1,16 @@
 (setq gc-cons-threshold 10000000)
+(setq byte-compile-warnings '(not obsolete))
+(setq warning-suppress-log-types '((comp) (bytecomp)))
+(setq native-comp-async-report-warnings-errors 'silent)
+
 (tool-bar-mode -1) ;; remove toolbar
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ;; mouse scroll one line at a time
 (setq mouse-wheel-progressive-speed nil) ;; don't accelerate mouse scrolling
+(add-hook 'prog-mode-hook 'display-line-numbers-mode) ;; Line numbers
+(setq-default tab-width 2) ;; Tabs have a width of 2 spaces
+(setq column-number-mode t) ;; Display column numbers
+(setq package-enable-at-startup nil)
+
 (setq
    backup-by-copying t
    backup-directory-alist
@@ -10,12 +19,6 @@
    kept-new-versions 6
    kept-old-versions 2
    version-control t)
-(add-hook 'prog-mode-hook 'display-line-numbers-mode) ;; Line numbers
-(setq-default indent-tabs-mode t) ;; Tabs as indentation
-(setq-default tab-width 2) ;; Tabs have a width of 2 spaces
-;;(add-to-list 'default-frame-alist '(fullscreen . maximized)) ;; start every frame maximized
-(setq column-number-mode t) ;; Display column numbers
-(setq package-enable-at-startup nil)
 
 ;; Tree-sitter configuration
 (setq treesit-language-source-alist
@@ -45,10 +48,10 @@
 (straight-use-package 'use-package)
 
 ;; Magic hack for garbage collector
-(use-package gcmh
-	:straight t
-	:ensure t)
-(gcmh-mode 1)
+;; (use-package gcmh
+;; 	:straight t
+;; 	:ensure t)
+;; (gcmh-mode 1)
 
 ;; Guix package manager utility for Emacs
 (use-package geiser
@@ -66,7 +69,7 @@
 	:straight t
 	:ensure t)
 
-;; Packages to explore assembly
+;; Package to explore assembly (Compiler explorer style)
 (use-package rmsbolt
 	:straight t
 	:ensure t)
@@ -140,12 +143,12 @@
 				 (cider-repl-mode . enable-paredit-mode)
 				 (eval-expression-minibuffer-setup . enable-paredit-mode)
 				 (ielm-mode . enable-paredit-mode)))
-  
-;; Haskell Mode
-;; (use-package haskell-mode
-;;   :ensure t)
 
-;; OCaml Mode
+;; Haskell Mode
+(use-package haskell-mode
+  :ensure t)
+
+;; ;; OCaml Mode
 ;; (use-package tuareg
 ;;   :ensure t
 ;;   :config
@@ -158,12 +161,31 @@
 ;;   (add-hook 'tuareg-mode-hook 'merlin-mode))
 
 ;; Rust Mode
-;; (use-package rust-mode
-;;   :ensure t)
+(use-package rust-mode
+  :ensure t)
 
 ;; Lua Mode
-;; (use-package lua-mode
-;; 	:ensure t)
+(use-package lua-mode
+	:ensure t)
+
+(use-package emacs
+	:hook
+  ;; Auto parenthesis matching
+  ((prog-mode . electric-pair-mode)))
+
+(use-package envrc
+	:straight t
+  :bind (:map envrc-mode-map
+							("C-c e" . envrc-command-map))
+  ;:config (which-key-add-key-based-replacements "C-c e" "envrc")
+  :init (envrc-global-mode))
+
+;; Motion aid
+(use-package avy
+	:straight t
+  :demand t
+  :bind (("C-c j" . avy-goto-line)
+         ("s-j"   . avy-goto-char-timer)))
 
 ;; Ivy and Counsel (better completion)
 (use-package ivy
@@ -254,14 +276,14 @@
 	:straight t
 	:commands lsp-ui-mode)
 ;; if you are helm user
-(use-package helm-lsp 
+(use-package helm-lsp
 	:straight t
 	:commands helm-lsp-workspace-symbol)
 ;; if you are ivy user
-(use-package lsp-ivy 
+(use-package lsp-ivy
 	:straight t
 	:commands lsp-ivy-workspace-symbol)
-(use-package lsp-treemacs 
+(use-package lsp-treemacs
 	:straight t
 	:commands lsp-treemacs-errors-list)
 
@@ -276,3 +298,8 @@
 	:straight t
 	:config
   (which-key-mode))
+
+
+;; Set font last to make sure it stays
+(set-frame-font "Ubuntu Mono Medium" nil t)
+(set-face-attribute 'default nil :height 120)
