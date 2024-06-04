@@ -219,56 +219,60 @@
     :config (counsel-projectile-mode)))
 
 ;; Eglot
-(use-package eglot
-  :straight t
-	:ensure t
-	:hook ((c-mode . eglot-ensure)
-				 (c++-mode . eglot-ensure)
-				 (c-ts-mode . eglot-ensure)
-				 (c++-ts-mode . eglot-ensure)
-				 (cuda-mode . eglot-ensure)
-				 (eglot-managed-mode . (lambda () (eglot-inlay-hints-mode -1)))))
+;; (use-package eglot
+;;   :straight t
+;; 	:ensure t
+;; 	:hook ((c-mode . eglot-ensure)
+;; 				 (c++-mode . eglot-ensure)
+;; 				 (c-ts-mode . eglot-ensure)
+;; 				 (c++-ts-mode . eglot-ensure)
+;; 				 (cuda-mode . eglot-ensure)
+;; 				 (eglot-managed-mode . (lambda () (eglot-inlay-hints-mode -1)))))
 
-(require 'eglot)
-(add-to-list 'eglot-server-programs '((c++-ts-mode c-ts-mode c++-mode c-mode cuda-mode) "clangd"))
+;; (require 'eglot)
+;; (add-to-list 'eglot-server-programs '((c++-ts-mode c-ts-mode c++-mode c-mode cuda-mode) "clangd"))
 
-;; ;; LSP-Mode and DAP-Mode
-;; (use-package lsp-mode
-;; 	:straight t
-;;   :init
-;;   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-;;   (setq lsp-keymap-prefix "C-c l")
-;;   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-;;          (c-mode . lsp)
-;;          (c++-mode . lsp)
-;;          (cuda-mode . lsp)
-;;          ;; if you want which-key integration
-;;          (lsp-mode . lsp-enable-which-key-integration))
-;;   :commands lsp)
+;; LSP-Mode and DAP-Mode
+(use-package lsp-mode
+	:straight t
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-c l")
+  :hook ((c-mode . lsp)
+         (c++-mode . lsp)
+         (c-or-c++-mode . lsp)
+				 (c-ts-mode . lsp)
+         (c++-ts-mode . lsp)
+         (c-or-c++-ts-mode . lsp)
+         (cuda-mode . lsp)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp)
 
-;; ;; optionally
-;; (use-package lsp-ui
-;; 	:straight t
-;; 	:commands lsp-ui-mode)
-;; ;; if you are helm user
-;; (use-package helm-lsp 
-;; 	:straight t
-;; 	:commands helm-lsp-workspace-symbol)
-;; ;; if you are ivy user
-;; (use-package lsp-ivy 
-;; 	:straight t
-;; 	:commands lsp-ivy-workspace-symbol)
-;; (use-package lsp-treemacs 
-;; 	:straight t
-;; 	:commands lsp-treemacs-errors-list)
+;; optionally
+(use-package lsp-ui
+	:straight t
+	:commands lsp-ui-mode)
+;; if you are helm user
+(use-package helm-lsp 
+	:straight t
+	:commands helm-lsp-workspace-symbol)
+;; if you are ivy user
+(use-package lsp-ivy 
+	:straight t
+	:commands lsp-ivy-workspace-symbol)
+(use-package lsp-treemacs 
+	:straight t
+	:commands lsp-treemacs-errors-list)
 
-;; ;; optionally if you want to use debugger
-;; (use-package dap-mode
-;; 	:straight t)
-;; ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
+;; optionally if you want to use debugger
+(use-package dap-mode
+	:straight t)
+(use-package dap-gdb-lldb)
+(require 'dap-gdb-lldb)
 
-;; ;; optional if you want which-key integration
-;; (use-package which-key
-;; 	:straight t
-;; 	:config
-;;     (which-key-mode))
+;; optional if you want which-key integration
+(use-package which-key
+	:straight t
+	:config
+  (which-key-mode))
