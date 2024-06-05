@@ -28,8 +28,9 @@
 (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))
 
 (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
-(add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
-(add-to-list 'major-mode-remap-alist '(c-or-c++-mode . c-or-c++-ts-mode))
+;;Some weird bug with C++ ts mode
+;;(add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
+;;(add-to-list 'major-mode-remap-alist '(c-or-c++-mode . c-or-c++-ts-mode))
 
 ;; Bootstrap straight.el (do not modify)
 (defvar bootstrap-version)
@@ -100,6 +101,12 @@
   ;; disable inline previews
   (delq 'company-preview-if-just-one-frontend company-frontends))
 
+;; LLM Client
+(use-package gptel
+	:straight t)
+
+(setq auth-sources '("~/.authinfo"))
+
 ;; Highlight TODO, FIXME, etc.
 (use-package hl-todo
   :straight (:host github :repo "tarsius/hl-todo" :files ("*.el"))
@@ -107,10 +114,10 @@
   :hook (prog-mode . hl-todo-mode))
 
 ;; ;; CUDA Mode
-;; (use-package cuda-mode
-;;   :straight t
-;; 	:ensure t)
-(add-to-list 'auto-mode-alist '("\\.cu\\'" . c++-ts-mode))
+(use-package cuda-mode
+  :straight t
+	:ensure t)
+(add-to-list 'auto-mode-alist '("\\.cu\\'" . cuda-mode))
 
 ;; CMake Mode
 (use-package cmake-mode
