@@ -83,6 +83,10 @@
 				 ("C-c m p" . 'mc/mark-previous-like-this)
 				 ("C-c m a" . 'mc/mark-all-like-this)))
 
+;; Set regex mode for re-builder to string
+(require 're-builder)
+(setq reb-re-syntax 'string)
+
 ;; GitHub Copilot
 (use-package copilot
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
@@ -312,3 +316,4 @@
 ;; Set font last to make sure it stays
 (set-frame-font "Ubuntu Mono Medium" nil t)
 (set-face-attribute 'default nil :height 120)
+(put 'narrow-to-region 'disabled nil)
