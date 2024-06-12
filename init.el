@@ -9,7 +9,6 @@
 (add-hook 'prog-mode-hook 'display-line-numbers-mode) ;; Line numbers
 (setq-default tab-width 2) ;; Tabs have a width of 2 spaces
 (setq column-number-mode t) ;; Display column numbers
-(setq package-enable-at-startup nil)
 
 (setq
    backup-by-copying t
@@ -153,6 +152,7 @@
 
 ;; Haskell Mode
 (use-package haskell-mode
+	:straight t
   :ensure t)
 
 ;; ;; OCaml Mode
@@ -169,10 +169,12 @@
 
 ;; Rust Mode
 (use-package rust-mode
+	:straight t
   :ensure t)
 
 ;; Lua Mode
 (use-package lua-mode
+	:straight t
 	:ensure t)
 
 (use-package emacs
