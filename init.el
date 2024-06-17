@@ -11,13 +11,64 @@
 (setq column-number-mode t) ;; Display column numbers
 
 (setq
-   backup-by-copying t
-   backup-directory-alist
-    '(("." . "~/.config/emacs/backups/"))
-   delete-old-versions t
-   kept-new-versions 6
-   kept-old-versions 2
-   version-control t)
+ backup-by-copying t
+ backup-directory-alist
+ '(("." . "~/.config/emacs/backups/"))
+ delete-old-versions t
+ kept-new-versions 6
+ kept-old-versions 2
+ version-control t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Bootstrap elpaca (do not modify manually) ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defvar elpaca-installer-version 0.7)
+(defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
+(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
+(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+(defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
+                              :ref nil :depth 1
+                              :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                              :build (:not elpaca--activate-package)))
+(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+       (build (expand-file-name "elpaca/" elpaca-builds-directory))
+       (order (cdr elpaca-order))
+       (default-directory repo))
+  (add-to-list 'load-path (if (file-exists-p build) build repo))
+  (unless (file-exists-p repo)
+    (make-directory repo t)
+    (when (< emacs-major-version 28) (require 'subr-x))
+    (condition-case-unless-debug err
+        (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                 ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
+                                                 ,@(when-let ((depth (plist-get order :depth)))
+                                                     (list (format "--depth=%d" depth) "--no-single-branch"))
+                                                 ,(plist-get order :repo) ,repo))))
+                 ((zerop (call-process "git" nil buffer t "checkout"
+                                       (or (plist-get order :ref) "--"))))
+                 (emacs (concat invocation-directory invocation-name))
+                 ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                       "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                 ((require 'elpaca))
+                 ((elpaca-generate-autoloads "elpaca" repo)))
+            (progn (message "%s" (buffer-string)) (kill-buffer buffer))
+          (error "%s" (with-current-buffer buffer (buffer-string))))
+      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+  (unless (require 'elpaca-autoloads nil t)
+    (require 'elpaca)
+    (elpaca-generate-autoloads "elpaca" repo)
+    (load "./elpaca-autoloads")))
+(add-hook 'after-init-hook #'elpaca-process-queues)
+(elpaca `(,@elpaca-order))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; End bootstrap of elpaca ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Elpaca configuration
+;; Install use-package support
+(elpaca elpaca-use-package
+  ;; Enable use-package :ensure support for Elpaca.
+  (elpaca-use-package-mode))
 
 ;; Tree-sitter configuration
 (setq treesit-language-source-alist
@@ -31,37 +82,22 @@
 ;;(add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
 ;;(add-to-list 'major-mode-remap-alist '(c-or-c++-mode . c-or-c++-ts-mode))
 
-;; Bootstrap straight.el (do not modify)
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el"
-												 user-emacs-directory))
-      (bootstrap-version 6))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-(straight-use-package 'use-package)
-
-;; Org-mode settings
-(straight-use-package 'org)
-
-(setq org-directory      "~/org"
+;; Org-mode configuration
+(use-package org
+	:ensure t
+	:bind (("C-c o l" . 'org-store-link)
+				 ("C-c o a" . 'org-agenda)
+				 ("C-c o c" . 'org-capture))
+	:config
+	(setq org-directory      "~/org"
 			org-agenda-files   (list "~/org/todo/")
-      org-log-done 'time
-			)
-
-(global-set-key (kbd "C-c o l") #'org-store-link)
-(global-set-key (kbd "C-c o a") #'org-agenda)
-(global-set-key (kbd "C-c o c") #'org-capture)
+      org-log-done 'time))
 
 (use-package org-roam
-	:straight t
-	:ensure t
+	:ensure (:post-build (org-roam-db-autosync-mode))
+	:bind (("C-c o r f" . 'org-roam-node-find)
+				 ("C-c o r l" . 'org-roam-node-insert)
+				 ("C-c o r c" . 'org-roam-capture))
 	:config
 	(setq org-roam-directory (file-truename "~/org/roam"))
 	(setq org-roam-dailies-directory "dailies")
@@ -69,43 +105,27 @@
 				'(("d" "default" entry
 					 "* %?"
 					 :target (file+head "%<%Y-%m-%d>.org"
-															"#+title: %<%Y-%m-%d>\n"))))
-	:bind (("C-c o r f" . 'org-roam-node-find)
-				 ("C-c o r l" . 'org-roam-node-insert)
-				 ("C-c o r c" . 'org-roam-capture)))
-
-(org-roam-db-autosync-mode)
-
-;; Magic hack for garbage collector
-;; (use-package gcmh
-;; 	:straight t
-;; 	:ensure t)
-;; (gcmh-mode 1)
+															"#+title: %<%Y-%m-%d>\n")))))
 
 ;; Guix package manager utility for Emacs
 (use-package geiser
-	:straight t
 	:ensure t
 	:config
 	(setq geiser-guile-binary (executable-find "guile-3.0"))
 	(setq geiser-default-implementation '(guile)))
 
 (use-package geiser-guile
-	:straight t
 	:ensure t)
 
 (use-package guix
-	:straight t
 	:ensure t)
 
 ;; Package to explore assembly (Compiler explorer style)
 (use-package rmsbolt
-	:straight t
 	:ensure t)
 
 ;; Multiple cursors
 (use-package multiple-cursors
-	:straight t
 	:ensure t
 	:bind (("C-c m c" . 'mc/edit-lines)
 				 ("C-c m n" . 'mc/mark-next-like-this)
@@ -118,8 +138,7 @@
 
 ;; GitHub Copilot
 (use-package copilot
-  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-  :ensure t
+  :ensure (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
 	:bind (("C-c c c" . 'copilot-complete)
 				 ("C-c c a" . 'copilot-accept-completion)
 				 ("C-c c l" . 'copilot-accept-completion-by-line)
@@ -135,36 +154,29 @@
 
 ;; LLM Client
 (use-package gptel
-	:straight t)
+	:ensure t)
 
 (setq auth-sources '("~/.authinfo"))
 
 ;; Highlight TODO, FIXME, etc.
 (use-package hl-todo
-  :straight (:host github :repo "tarsius/hl-todo" :files ("*.el"))
-	:ensure t
+  :ensure (:host github :repo "tarsius/hl-todo" :files ("*.el"))
   :hook (prog-mode . hl-todo-mode))
 
 ;; ;; CUDA Mode
 (use-package cuda-mode
-  :straight t
 	:ensure t)
 (add-to-list 'auto-mode-alist '("\\.cu\\'" . cuda-mode))
 
 ;; CMake Mode
 (use-package cmake-mode
-	:straight (:host github :repo "Kitware/CMake" :files ("Auxiliary/cmake-mode.el"))
-	:ensure t)
-(require 'cmake-mode)
+	:ensure (:host github :repo "Kitware/CMake" :files ("Auxiliary/cmake-mode.el")))
 
 (use-package cmake-font-lock
-	:straight t
 	:ensure t)
-(require 'cmake-font-lock)
 
 ;; ParEdit
 (use-package paredit
-	:straight t
 	:ensure t
 	:hook ((emacs-lisp-mode . paredit-mode)
 				 (lisp-mode . paredit-mode)
@@ -185,7 +197,6 @@
 
 ;; Haskell Mode
 (use-package haskell-mode
-	:straight t
   :ensure t)
 
 ;; ;; OCaml Mode
@@ -202,21 +213,14 @@
 
 ;; Rust Mode
 (use-package rust-mode
-	:straight t
   :ensure t)
 
 ;; Lua Mode
 (use-package lua-mode
-	:straight t
 	:ensure t)
 
-(use-package emacs
-	:hook
-  ;; Auto parenthesis matching
-  ((prog-mode . electric-pair-mode)))
-
 (use-package envrc
-	:straight t
+	:ensure t
   :bind (:map envrc-mode-map
 							("C-c e" . envrc-command-map))
   ;:config (which-key-add-key-based-replacements "C-c e" "envrc")
@@ -224,19 +228,17 @@
 
 ;; Motion aid
 (use-package avy
-	:straight t
+	:ensure t
   :demand t
   :bind (("C-c j" . avy-goto-line)
          ("s-j"   . avy-goto-char-timer)))
 
 ;; Ivy and Counsel (better completion)
 (use-package ivy
-  :straight t
 	:ensure t
   :config (ivy-mode))
 
 (use-package counsel
-  :straight t
 	:ensure t
   :after ivy
   :config (counsel-mode))
@@ -246,23 +248,19 @@
 (load "/usr/share/emacs/site-lisp/clang-format/clang-format.el")
 (global-set-key (kbd "C-M-i") 'clang-format-buffer)
 
-(use-package magit
-  :straight t
-	:ensure t)
+(elpaca transient)
+(elpaca git-commit)
+(elpaca magit)
 
 (use-package company
-  :straight t
 	:ensure t
   :init
   (setq company-idle-delay 0)
+	:hook ((prog-mode . (lambda () (when (file-remote-p default-directory) (company-mode -1)))))
   :config
   (define-key company-active-map (kbd "C-n") #'company-select-next)
   (define-key company-active-map (kbd "C-p") #'company-select-previous)
   (global-company-mode))
-
-(add-hook ;; Disable company mode in ssh to avoid latency
- 'prog-mode-hook
- (lambda () (when (file-remote-p default-directory) (company-mode -1))))
 
 ;; (use-package company-box
 ;;   :straight (:host github :repo "sebastiencs/company-box" :files ("*.el"))
@@ -270,17 +268,16 @@
 ;; (add-hook 'company-mode-hook 'company-box-mode)
 
 (use-package projectile
-  :straight t
 	:ensure t
   :after ivy
   :config
   (projectile-mode 1)
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-  (use-package counsel-projectile
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
+
+(use-package counsel-projectile
     :after projectile
-		:straight t
     :ensure t
-    :config (counsel-projectile-mode)))
+    :config (counsel-projectile-mode))
 
 ;; Eglot
 ;; (use-package eglot
@@ -298,7 +295,7 @@
 
 ;; LSP-Mode and DAP-Mode
 (use-package lsp-mode
-	:straight t
+	:ensure t
   :init
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l")
@@ -315,32 +312,38 @@
 
 ;; optionally
 (use-package lsp-ui
-	:straight t
+	:ensure t
 	:commands lsp-ui-mode)
 ;; if you are helm user
 (use-package helm-lsp
-	:straight t
+	:ensure t
 	:commands helm-lsp-workspace-symbol)
 ;; if you are ivy user
 (use-package lsp-ivy
-	:straight t
+	:ensure t
 	:commands lsp-ivy-workspace-symbol)
 (use-package lsp-treemacs
-	:straight t
+	:ensure t
 	:commands lsp-treemacs-errors-list)
 
 ;; optionally if you want to use debugger
 (use-package dap-mode
-	:straight t)
-(use-package dap-gdb-lldb)
-(require 'dap-gdb-lldb)
+	:ensure t)
+;; (use-package dap-gdb-lldb
+;; 	:ensure t)
 
 ;; optional if you want which-key integration
 (use-package which-key
-	:straight t
+	:ensure t
 	:config
   (which-key-mode))
 
+;; Emacs configuration
+(use-package emacs
+	:ensure nil
+	:hook
+  ;; Auto parenthesis matching
+  ((prog-mode . electric-pair-mode)))
 
 ;; Set font last to make sure it stays
 (set-frame-font "Ubuntu Mono Medium" nil t)
