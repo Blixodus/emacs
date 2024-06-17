@@ -47,6 +47,35 @@
   (load bootstrap-file nil 'nomessage))
 (straight-use-package 'use-package)
 
+;; Org-mode settings
+(straight-use-package 'org)
+
+(setq org-directory      "~/org"
+			org-agenda-files   (list "~/org/todo/")
+      org-log-done 'time
+			)
+
+(global-set-key (kbd "C-c o l") #'org-store-link)
+(global-set-key (kbd "C-c o a") #'org-agenda)
+(global-set-key (kbd "C-c o c") #'org-capture)
+
+(use-package org-roam
+	:straight t
+	:ensure t
+	:config
+	(setq org-roam-directory (file-truename "~/org/roam"))
+	(setq org-roam-dailies-directory "dailies")
+	(setq org-roam-dailies-capture-templates
+				'(("d" "default" entry
+					 "* %?"
+					 :target (file+head "%<%Y-%m-%d>.org"
+															"#+title: %<%Y-%m-%d>\n"))))
+	:bind (("C-c o r f" . 'org-roam-node-find)
+				 ("C-c o r l" . 'org-roam-node-insert)
+				 ("C-c o r c" . 'org-roam-capture)))
+
+(org-roam-db-autosync-mode)
+
 ;; Magic hack for garbage collector
 ;; (use-package gcmh
 ;; 	:straight t
