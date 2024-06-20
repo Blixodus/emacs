@@ -3,13 +3,14 @@
 (setq warning-suppress-log-types '((comp) (bytecomp)))
 (setq native-comp-async-report-warnings-errors 'silent)
 
-(tool-bar-mode -1) ;; remove toolbar
-(setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ;; mouse scroll one line at a time
-(setq mouse-wheel-progressive-speed nil) ;; don't accelerate mouse scrolling
+(tool-bar-mode -1)                                    ;; remove toolbar
+(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))   ;; mouse scroll one line at a time
+(setq mouse-wheel-progressive-speed nil)              ;; don't accelerate mouse scrolling
 (add-hook 'prog-mode-hook 'display-line-numbers-mode) ;; Line numbers
-(setq-default tab-width 2) ;; Tabs have a width of 2 spaces
-(setq column-number-mode t) ;; Display column numbers
+(setq-default tab-width 2)                            ;; Tabs have a width of 2 spaces
+(setq column-number-mode t)                           ;; Display column number on mode line
 
+;; Do not litter with backups
 (setq
  backup-by-copying t
  backup-directory-alist
@@ -90,14 +91,24 @@
 				 ("C-c o c" . 'org-capture))
 	:config
 	(setq org-directory      "~/org"
-			org-agenda-files   (list "~/org/todo/")
-      org-log-done 'time))
+				org-agenda-files   (list "~/org/todo/" "~/org/roam/dailies/")
+				org-log-done 'time))
 
 (use-package org-roam
-	:ensure (:post-build (org-roam-db-autosync-mode))
+	:ensure t
 	:bind (("C-c o r f" . 'org-roam-node-find)
 				 ("C-c o r l" . 'org-roam-node-insert)
-				 ("C-c o r c" . 'org-roam-capture))
+				 ("C-c o r c" . 'org-roam-capture)
+				 ("C-c o d t" . 'org-roam-dailies-capture-today)
+				 ("C-c o d g" . 'org-roam-dailies-goto-today)
+				 ("C-c o d r" . 'org-roam-dailies-capture-tomorrow)
+				 ("C-c o d f" . 'org-roam-dailies-goto-tomorrow)
+				 ("C-c o d y" . 'org-roam-dailies-capture-yesterday)
+				 ("C-c o d h" . 'org-roam-dailies-goto-yesterday)
+				 ("C-c o d e" . 'org-roam-dailies-capture-date)
+				 ("C-c o d d" . 'org-roam-dailies-goto-date)
+				 ("C-c o d n" . 'org-roam-dailies-goto-next-note)
+				 ("C-c o d p" . 'org-roam-dailies-goto-previous-note))
 	:config
 	(setq org-roam-directory (file-truename "~/org/roam"))
 	(setq org-roam-dailies-directory "dailies")
@@ -105,7 +116,8 @@
 				'(("d" "default" entry
 					 "* %?"
 					 :target (file+head "%<%Y-%m-%d>.org"
-															"#+title: %<%Y-%m-%d>\n")))))
+															"#+title: %<%Y-%m-%d>\n"))))
+	(org-roam-db-autosync-mode))
 
 ;; Guix package manager utility for Emacs
 (use-package geiser
@@ -155,8 +167,6 @@
 ;; LLM Client
 (use-package gptel
 	:ensure t)
-
-(setq auth-sources '("~/.authinfo"))
 
 ;; Highlight TODO, FIXME, etc.
 (use-package hl-todo
