@@ -91,8 +91,16 @@
 				 ("C-c o c" . 'org-capture))
 	:config
 	(setq org-directory      "~/org"
-				org-agenda-files   (list "~/org/todo/" "~/org/roam/dailies/")
-				org-log-done 'time))
+				org-agenda-files   (list "~/org/" "~/org/dailies/")
+				org-log-done 'time)
+	(setq org-todo-keywords
+				'((sequence "TODO(t)" "STARTED(s)" "|" "DONE(d)")
+					(sequence "REPORT(r)" "BUG(b)" "KNOWNCAUSE(k)" "|" "FIXED(f)")
+					(sequence "WAITING(w)" "|" "POSTPONE" "CANCELED(c)")))
+	(setq org-todo-keyword-faces
+				'(("STARTED" . "orange")
+					("WAITING" . "magenta")
+					("POSTPONE" . "blue"))))
 
 (use-package org-roam
 	:ensure t
@@ -110,7 +118,7 @@
 				 ("C-c o d n" . 'org-roam-dailies-goto-next-note)
 				 ("C-c o d p" . 'org-roam-dailies-goto-previous-note))
 	:config
-	(setq org-roam-directory (file-truename "~/org/roam"))
+	(setq org-roam-directory (file-truename "~/org"))
 	(setq org-roam-dailies-directory "dailies")
 	(setq org-roam-dailies-capture-templates
 				'(("d" "default" entry
@@ -285,62 +293,66 @@
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 
 (use-package counsel-projectile
-    :after projectile
-    :ensure t
-    :config (counsel-projectile-mode))
+  :after projectile
+  :ensure t
+  :config (counsel-projectile-mode))
+
+(use-package eldoc
+	:ensure (:wait t))
+(use-package jsonrpc
+	:ensure (:wait t))
 
 ;; Eglot
-;; (use-package eglot
-;;   :straight t
+(use-package eglot
+	:ensure (:wait t)
+	:hook ((c-mode . eglot-ensure)
+				 (c++-mode . eglot-ensure)
+				 (c-ts-mode . eglot-ensure)
+				 (c++-ts-mode . eglot-ensure)
+				 (cuda-mode . eglot-ensure)
+				 (eglot-managed-mode . (lambda () (eglot-inlay-hints-mode -1)))))
+
+(require 'eglot)
+(add-to-list 'eglot-server-programs '((c++-ts-mode c-ts-mode c++-mode c-mode cuda-mode) "clangd"))
+
+;; ;; LSP-Mode and DAP-Mode
+;; (use-package lsp-mode
 ;; 	:ensure t
-;; 	:hook ((c-mode . eglot-ensure)
-;; 				 (c++-mode . eglot-ensure)
-;; 				 (c-ts-mode . eglot-ensure)
-;; 				 (c++-ts-mode . eglot-ensure)
-;; 				 (cuda-mode . eglot-ensure)
-;; 				 (eglot-managed-mode . (lambda () (eglot-inlay-hints-mode -1)))))
+;;   :init
+;;   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+;;   (setq lsp-keymap-prefix "C-c l")
+;;   :hook ((c-mode . lsp)
+;;          (c++-mode . lsp)
+;;          (c-or-c++-mode . lsp)
+;; 				 (c-ts-mode . lsp)
+;;          (c++-ts-mode . lsp)
+;;          (c-or-c++-ts-mode . lsp)
+;;          (cuda-mode . lsp)
+;;          ;; if you want which-key integration
+;;          (lsp-mode . lsp-enable-which-key-integration))
+;;   :commands lsp)
 
-;; (require 'eglot)
-;; (add-to-list 'eglot-server-programs '((c++-ts-mode c-ts-mode c++-mode c-mode cuda-mode) "clangd"))
+;; ;; optionally
+;; (use-package lsp-ui
+;; 	:ensure t
+;; 	:commands lsp-ui-mode)
+;; ;; if you are helm user
+;; (use-package helm-lsp
+;; 	:ensure t
+;; 	:commands helm-lsp-workspace-symbol)
+;; ;; if you are ivy user
+;; (use-package lsp-ivy
+;; 	:ensure t
+;; 	:commands lsp-ivy-workspace-symbol)
+;; (use-package lsp-treemacs
+;; 	:ensure t
+;; 	:commands lsp-treemacs-errors-list)
 
-;; LSP-Mode and DAP-Mode
-(use-package lsp-mode
-	:ensure t
-  :init
-  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-  (setq lsp-keymap-prefix "C-c l")
-  :hook ((c-mode . lsp)
-         (c++-mode . lsp)
-         (c-or-c++-mode . lsp)
-				 (c-ts-mode . lsp)
-         (c++-ts-mode . lsp)
-         (c-or-c++-ts-mode . lsp)
-         (cuda-mode . lsp)
-         ;; if you want which-key integration
-         (lsp-mode . lsp-enable-which-key-integration))
-  :commands lsp)
-
-;; optionally
-(use-package lsp-ui
-	:ensure t
-	:commands lsp-ui-mode)
-;; if you are helm user
-(use-package helm-lsp
-	:ensure t
-	:commands helm-lsp-workspace-symbol)
-;; if you are ivy user
-(use-package lsp-ivy
-	:ensure t
-	:commands lsp-ivy-workspace-symbol)
-(use-package lsp-treemacs
-	:ensure t
-	:commands lsp-treemacs-errors-list)
-
-;; optionally if you want to use debugger
-(use-package dap-mode
-	:ensure t)
-;; (use-package dap-gdb-lldb
+;; ;; optionally if you want to use debugger
+;; (use-package dap-mode
 ;; 	:ensure t)
+;; ;; (use-package dap-gdb-lldb
+;; ;; 	:ensure t)
 
 ;; optional if you want which-key integration
 (use-package which-key
