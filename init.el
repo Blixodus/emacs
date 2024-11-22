@@ -297,14 +297,9 @@
   :ensure t
   :config (counsel-projectile-mode))
 
-(use-package eldoc
-	:ensure (:wait t))
-(use-package jsonrpc
-	:ensure (:wait t))
-
 ;; Eglot
 (use-package eglot
-	:ensure (:wait t)
+	:ensure nil
 	:hook ((c-mode . eglot-ensure)
 				 (c++-mode . eglot-ensure)
 				 (c-ts-mode . eglot-ensure)
