@@ -355,6 +355,10 @@
 	:config
   (which-key-mode))
 
+;; libvterm intergation
+(use-package vterm
+    :ensure t)
+
 ;; Emacs configuration
 (use-package emacs
 	:ensure nil
@@ -363,6 +367,20 @@
   ((prog-mode . electric-pair-mode)))
 
 ;; Set font last to make sure it stays
-(set-frame-font "Ubuntu Mono Medium" nil t)
-(set-face-attribute 'default nil :height 120)
 (put 'narrow-to-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(column-number-mode t)
+ '(custom-enabled-themes '(modus-vivendi))
+ '(tool-bar-mode nil))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:family "Iosevka Nerd Font Mono" :foundry "UKWN" :slant normal :weight regular :height 120 :width normal)))))
